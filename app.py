@@ -4,7 +4,7 @@ import cmd
 
 class ContactManager(cmd.Cmd):
     """Handler for the incoming commands."""
-    def do_add(self, name, p):
+    def do_add(self, name):
         """Creates a new contact."""
         pass
 
