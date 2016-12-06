@@ -13,6 +13,7 @@ Options:
 
 import cmd
 from docopt import docopt, DocoptExit
+
 import sys
 
 def docopt_cmd(func):
@@ -85,6 +86,7 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_sync(self, line):
         """Usage: sync"""
+        pass
 
     @docopt_cmd
     def do_exit(self, line):
@@ -102,4 +104,4 @@ OPT = docopt(__doc__, sys.argv[1:], version="ContactManager version: 1.0")
 if OPT['--interactive']:
     ContactManager().cmdloop()
 
-print OPT
+

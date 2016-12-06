@@ -1,7 +1,8 @@
-"""Application testcases"""
+#!/home/giddy/Desktop/bootcamp/project/contactmanager/.env/bin/python
+"""Application Testcases"""
 
-from app import ContactManager
 from unittest import TestCase
+from contactmanager.app import ContactManager
 
 class TestContactManager(TestCase):
     """Testcases for the methods in app.py file"""
@@ -27,6 +28,7 @@ class TestContactManager(TestCase):
 
     def test_syncs_with_firebase(self):
         """Test if the contact gets synced upon saving"""
+        pass
 
     def test_created_but_not_synced(self):
         """Save contact"""
