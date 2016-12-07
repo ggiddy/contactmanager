@@ -1,4 +1,5 @@
 /.env/
 *.pyc
 /.vscode/
+contacts.db
 *.db
