@@ -12,7 +12,7 @@ Options:
 """
 
 import cmd
-from docopt import docopt
+from docopt import docopt, DocoptExit
 import sys
 
 def docopt_cmd(func):
