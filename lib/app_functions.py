@@ -2,6 +2,8 @@
 import re
 from database.db_functions import DbManipulator
 
+
+DBM = DbManipulator()
 def new_contact(line):
     """Validate and create a new contact"""
 
@@ -15,15 +17,14 @@ def new_contact(line):
         phone_number = line['<phone_number>']
 
         # Check if phone number has been saved
-        dbm = DbManipulator()
-        contact = dbm.get(first_name)
+        contact = DBM.get(first_name)
         print contact
         if phone_number == contact.phone_number:
             # Phone number already saved.
             return "That phone number already exists"
         else:
             # Save contact and return it
-            new = dbm.create(first_name, phone_number, last_name)
+            new = DBM.create(first_name, phone_number, last_name)
             return new
     else:
         return "Not a valid phone number"
@@ -32,6 +33,11 @@ def new_contact(line):
     # Else add user
     return "Creating the new contact %s %s %s" \
             % (line['<first_name>'], line['<last_name>'], line['<phone_number>'])
+
+def all_contacts():
+    """Retrieve all contacts"""
+    contacts = DBM.get()
+    return contacts
 
 def search_contact():
     """Search a contact using the given parameters"""

@@ -62,12 +62,10 @@ class ContactManager(cmd.Cmd):
         pass
 
     @docopt_cmd
-    def do_viewall(self, line):
-        """Usage: viewall"""
-        # all_contacts = db_functions.get()
-        # if all_contacts:
-        #     for contact in all_contacts:
-        #         print contact.first_name + " " + contact.phone_number
+    def do_contacts(self, line):
+        """Usage: contacts"""
+        all_contacts = app_functions.all_contacts()
+        print all_contacts
 
     @docopt_cmd
     def do_text(self, line):
@@ -100,7 +98,6 @@ class ContactManager(cmd.Cmd):
         """Exits the app"""
         pass
 
-    @docopt_cmd
     def do_EOF(self, line):
         """Exit the app"""
         print "Good Bye"
@@ -109,6 +106,9 @@ class ContactManager(cmd.Cmd):
 OPT = docopt(__doc__, sys.argv[1:], version="ContactManager version: 1.0")
 
 if OPT['--interactive']:
-    ContactManager().cmdloop()
-
-print OPT
+    try:
+        print __doc__
+        ContactManager().cmdloop()
+    except KeyboardInterrupt:
+        print "Exiting App..."
+        

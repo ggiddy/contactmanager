@@ -27,9 +27,11 @@ class DbManipulator(object):
     def get(self, fname=None, lname=None, phone=None):
         """Fetches contacts from the DB"""
         if not (fname or lname or phone):
-            # Get all records
+
+            # Get all records if no params passed
             contacts = SESSION.query(Contacts).all()
             return contacts
+
         else:
             # Get specific records
             if fname:
