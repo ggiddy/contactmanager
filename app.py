@@ -14,6 +14,7 @@ Options:
 import cmd
 from docopt import docopt, DocoptExit
 import lib.app_functions as app_functions
+from lib.database import db_functions
 
 import sys
 
@@ -64,8 +65,9 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_contacts(self, line):
         """Usage: contacts"""
-        all_contacts = app_functions.all_contacts()
-        print all_contacts
+        all_contacts = db_functions.get()
+        for c in all_contacts:
+            print c.first_name +' '+ c.last_name +' '+ c.phone_number
 
     @docopt_cmd
     def do_text(self, line):
