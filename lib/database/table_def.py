@@ -28,7 +28,7 @@ class Messages(Base):
     sent_to = Column(Integer, ForeignKey('contacts.id'))
 
 # Create engine.
-ENGINE = create_engine('sqlite:///contacts.db')
+ENGINE = create_engine('sqlite:///../contacts.db')
 
 # Create all tables
 Base.metadata.create_all(ENGINE)

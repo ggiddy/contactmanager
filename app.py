@@ -13,6 +13,7 @@ Options:
 
 import cmd
 from docopt import docopt, DocoptExit
+from lib.functions import create, get, update, delete
 
 import sys
 
@@ -29,7 +30,8 @@ def docopt_cmd(func):
             # The DocoptExit is thrown when the args do not match.
             # We print a message to the user and the usage block.
 
-            print 'Invalid Command!\t\t' + e
+            print 'Invalid Command!'
+            print e
             return
 
         except SystemExit:
@@ -49,9 +51,12 @@ class ContactManager(cmd.Cmd):
     """Handler for the incoming commands."""
 
     @docopt_cmd
-    def do_add(self, name):
+    def do_add(self, line):
         """Usage: add -n <name> -p <phone_number>"""
-        pass
+        fname, phone = line['<name>'], line['<phone_number>']
+        created = create(fname, phone)
+        if created:
+            print "Adding successful"
 
     @docopt_cmd
     def do_search(self, name):
@@ -61,7 +66,10 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_viewall(self, line):
         """Usage: viewall"""
-        pass
+        all_contacts = get()
+        if all_contacts:
+            for contact in all_contacts:
+                print contact.first_name + " " + contact.phone_number
 
     @docopt_cmd
     def do_text(self, line):
@@ -104,4 +112,4 @@ OPT = docopt(__doc__, sys.argv[1:], version="ContactManager version: 1.0")
 if OPT['--interactive']:
     ContactManager().cmdloop()
 
-
+print OPT
