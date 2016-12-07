@@ -13,7 +13,7 @@ Options:
 
 import cmd
 from docopt import docopt, DocoptExit
-from lib.functions import create, get, update, delete
+import lib.app_functions as app_functions
 
 import sys
 
@@ -52,11 +52,9 @@ class ContactManager(cmd.Cmd):
 
     @docopt_cmd
     def do_add(self, line):
-        """Usage: add -n <name> -p <phone_number>"""
-        fname, phone = line['<name>'], line['<phone_number>']
-        created = create(fname, phone)
-        if created:
-            print "Adding successful"
+        """Usage: add -f <first_name> -l <last_name> -p <phone_number>"""
+        new = app_functions.new_contact(line)
+        print new
 
     @docopt_cmd
     def do_search(self, name):
@@ -66,15 +64,16 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_viewall(self, line):
         """Usage: viewall"""
-        all_contacts = get()
-        if all_contacts:
-            for contact in all_contacts:
-                print contact.first_name + " " + contact.phone_number
+        # all_contacts = db_functions.get()
+        # if all_contacts:
+        #     for contact in all_contacts:
+        #         print contact.first_name + " " + contact.phone_number
 
     @docopt_cmd
     def do_text(self, line):
         """Usage: text <name> -m <message>"""
-        pass
+        print "Enter the text message"
+        msg = input('->')
 
     @docopt_cmd
     def do_delete(self, line):
