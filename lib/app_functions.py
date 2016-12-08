@@ -88,3 +88,15 @@ def send_text():
                                                                 recipient['cost'])
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
+
+def delete_contact(line):
+    """Deletes a contact"""
+    first_name = line['<first_name>']
+    last_name = line['<last_name>']
+
+    deleted = db_functions.delete(first_name, last_name)
+
+    if deleted:
+        return "Successfully deleted contact"
+    else:
+        return "No contacts found matching provided names"

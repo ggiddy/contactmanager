@@ -15,8 +15,10 @@ import cmd
 from docopt import docopt, DocoptExit
 import lib.app_functions as app_functions
 from lib.database import db_functions
+from tabulate import tabulate
 
 import sys
+import os
 
 def docopt_cmd(func):
     """
@@ -60,15 +62,41 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_search(self, line):
         """Usage: search <first_name>"""
+        os.system('clear')
         contacts = app_functions.search_contact(line)
-        print contacts
+        conts = []
+        length = len(contacts)
+
+        for c in contacts:
+            contact = [c.first_name, c.last_name, c.phone_number]
+            conts.append(contact)
+
+        if length > 0:
+            if length > 1:
+                print str(length) + ' contacts found\n'
+                print tabulate(conts, \
+                    headers=['First Name', 'Last Name', 'Phone Number', 'Email'], \
+                    tablefmt='fancy_grid')
+            else:
+                print str(length) + ' contact found\n'
+                print tabulate(conts, \
+                    headers=['First Name', 'Last Name', 'Phone Number', 'Email'], \
+                    tablefmt='fancy_grid')
+        else:
+            print "No contacts found matching " + line['<first_name>']
 
     @docopt_cmd
     def do_contacts(self, line):
         """Usage: contacts"""
         all_contacts = db_functions.get()
+        conts = []
         for c in all_contacts:
-            print c.first_name +' '+ c.last_name +' '+ c.phone_number
+            contact = [c.first_name, c.last_name, c.phone_number]
+            conts.append(contact)
+        print tabulate(conts, \
+            headers=['First Name', 'Last Name', 'Phone Number', 'Email'], \
+            tablefmt='fancy_grid')
+
 
     @docopt_cmd
     def do_text(self, line):
@@ -78,8 +106,13 @@ class ContactManager(cmd.Cmd):
 
     @docopt_cmd
     def do_delete(self, line):
-        """Usage: del (<name> | <phone>)"""
-        pass
+        """Usage: del -f <first_name> -l <last_name>"""
+        sure = input('Are you sure you want to delete %s %s? Yes[Y] No[N]\t>>'\
+                     % (line['<first_name>'], line['<last_name>']))
+        if sure == ('y' or 'Y'):
+            print 'We sure hope you know what you\'re doing'
+        else:
+            print 'Okay'
 
     @docopt_cmd
     def do_edit(self, line):
