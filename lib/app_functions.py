@@ -1,6 +1,8 @@
 """Contains the main functions of the app"""
+import os
 import re
 from database import db_functions
+from tabulate import tabulate
 
 def new_contact(line):
     """Validate and create a new contact"""
@@ -62,11 +64,32 @@ def edit_contact(line):
 def delete_contact(line):
     """Deletes a contact"""
     first_name = line['<first_name>']
-    last_name = line['<last_name>']
+    contacts = db_functions.get(first_name)
 
-    deleted = db_functions.delete(first_name, last_name)
+    if len(contacts) > 0:
+        # There are contacts matching
+        conts = []
+        if len(contacts) > 1:
+            for c in contacts:
+                cts = [c.id, c.first_name, c.last_name]
+                conts.append(cts)
+            os.system('clear')
 
-    if deleted:
-        return "Successfully deleted contact"
+            print tabulate(conts, \
+                    headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
+                    tablefmt='fancy_grid')
+            try:
+                contact_id = int(raw_input("Enter the ID of the contact to delete: "))
+                deleted = db_functions.delete(contact_id)
+                if deleted:
+                    print "Deleted"
+            except ValueError:
+                print "Invalid entry"
+        elif len(contacts) == 1:
+            # only one contact, delete
+            contact_id = contacts[0].id
+            deleted = db_functions.delete(contact_id)
+            if deleted:
+                print "Deleted"
     else:
-        return "No contacts found matching provided names"
+        return []
