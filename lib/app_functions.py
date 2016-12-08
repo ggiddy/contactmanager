@@ -166,7 +166,8 @@ def sync():
             contact.id: {
                 "id": contact.id,
                 "first_name": contact.first_name,
-                "last_name": contact.last_name
+                "last_name": contact.last_name,
+                "phone_number": contact.phone_number
             }
         })
 
