@@ -35,7 +35,7 @@ def all_contacts():
     """Retrieve all contacts"""
     contacts = db_functions.get()
     if contacts:
-        print "Contacts found"
+        print "100 Contacts found"
         return contacts
 
 def search_contact(line):
