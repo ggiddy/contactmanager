@@ -67,6 +67,11 @@ def get(fname=None, lname=None, phone=None):
         if fname and lname:
             # Query using the fname, lname
             pass
+def get_by_id(id):
+    """Fetches a contact by id"""
+    contact = SESSION.query(Contacts).filter(Contacts.id == id).first()
+    return contact
+
 
 def search(any_param):
     """Searches for possible matches"""
@@ -76,6 +81,14 @@ def update(fname=None, lname=None, phone=None):
     """Updates a particular contact"""
     pass
 
-def delete(fname=None, lname=None):
+def delete(contact_id):
     """Deletes a contact"""
-    return 1
+    contact = SESSION.query(Contacts).filter(Contacts.id == contact_id).first()
+    if not contact:
+        print "Invalid id"
+    else:
+        print 'Deleting...'
+        deleted = SESSION.delete(contact)
+        SESSION.commit()
+        return True
+

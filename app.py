@@ -57,7 +57,7 @@ class ContactManager(cmd.Cmd):
     def do_add(self, line):
         """Usage: add -f <first_name> -l <last_name> -p <phone_number>"""
         new = app_functions.new_contact(line)
-        print new
+        print "Added %s %s %s" % (new.first_name, new.last_name, new.phone_number)
 
     @docopt_cmd
     def do_search(self, line):
@@ -75,12 +75,12 @@ class ContactManager(cmd.Cmd):
             if length > 1:
                 print str(length) + ' contacts found\n'
                 print tabulate(conts, \
-                    headers=['First Name', 'Last Name', 'Phone Number', 'Email'], \
+                    headers=['First Name', 'Last Name', 'Phone Number'], \
                     tablefmt='fancy_grid')
             else:
                 print str(length) + ' contact found\n'
                 print tabulate(conts, \
-                    headers=['First Name', 'Last Name', 'Phone Number', 'Email'], \
+                    headers=['First Name', 'Last Name', 'Phone Number'], \
                     tablefmt='fancy_grid')
         else:
             print "No contacts found matching " + line['<first_name>']
@@ -93,26 +93,31 @@ class ContactManager(cmd.Cmd):
         for c in all_contacts:
             contact = [c.first_name, c.last_name, c.phone_number]
             conts.append(contact)
-        print tabulate(conts, \
-            headers=['First Name', 'Last Name', 'Phone Number', 'Email'], \
-            tablefmt='fancy_grid')
+        length = len(all_contacts)
+        if length > 0:
+            if length > 1:
+                print str(length) + ' contacts found\n'
+                print tabulate(conts, \
+                    headers=['First Name', 'Last Name', 'Phone Number'], \
+                    tablefmt='fancy_grid')
+            else:
+                print str(length) + ' contact found\n'
+                print tabulate(conts, \
+                    headers=['First Name', 'Last Name', 'Phone Number'], \
+                    tablefmt='fancy_grid')
+        else:
+            print "You have no contacts"
 
 
     @docopt_cmd
     def do_text(self, line):
-        """Usage: text <name> -m <message>"""
-        print "Enter the text message"
-        msg = input('->')
+        """Usage: text <first_name> -m <message>"""
+        res = app_functions.send_text(line)
 
     @docopt_cmd
     def do_delete(self, line):
-        """Usage: del -f <first_name> -l <last_name>"""
-        sure = input('Are you sure you want to delete %s %s? Yes[Y] No[N]\t>>'\
-                     % (line['<first_name>'], line['<last_name>']))
-        if sure == ('y' or 'Y'):
-            print 'We sure hope you know what you\'re doing'
-        else:
-            print 'Okay'
+        """Usage: delete <first_name>"""
+        app_functions.delete_contact(line)
 
     @docopt_cmd
     def do_edit(self, line):
@@ -128,7 +133,7 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_sync(self, line):
         """Usage: sync"""
-        pass
+        app_functions.sync()
 
     @docopt_cmd
     def do_exit(self, line):
