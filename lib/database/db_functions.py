@@ -76,6 +76,6 @@ def update(fname=None, lname=None, phone=None):
     """Updates a particular contact"""
     pass
 
-def delete(fname=None, lname=None, phone=None):
+def delete(fname=None, lname=None):
     """Deletes a contact"""
-    pass
+    return 1

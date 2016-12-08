@@ -58,3 +58,15 @@ def edit_contact(line):
         if len(contact) > 0:
             # More than 1 contact with the same firstname found
             return contact
+
+def delete_contact(line):
+    """Deletes a contact"""
+    first_name = line['<first_name>']
+    last_name = line['<last_name>']
+
+    deleted = db_functions.delete(first_name, last_name)
+
+    if deleted:
+        return "Successfully deleted contact"
+    else:
+        return "No contacts found matching provided names"
