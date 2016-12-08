@@ -8,7 +8,6 @@ def new_contact(line):
     # Validate phone_number
     num = re.compile(r'^(07)(\d{8})$')
     if num.match(line['<phone_number>']):
-
         # Phone number valid
         first_name = line['<first_name>']
         last_name = line['<last_name>']
@@ -22,15 +21,15 @@ def new_contact(line):
                 if phone_number == con.phone_number:
                     # Phone number already saved.
                     return "That phone number already exists"
+            # Same name different phone number
+            new = db_functions.create(first_name, phone_number, last_name)
+            return new
         else:
             # Save contact and return it
             new = db_functions.create(first_name, phone_number, last_name)
             return new
     else: # Invalid phone
         return "Not a valid phone number"
-
-    return "Creating the new contact %s %s %s" \
-            % (line['<first_name>'], line['<last_name>'], line['<phone_number>'])
 
 def all_contacts():
     """Retrieve all contacts"""

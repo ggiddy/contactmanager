@@ -68,6 +68,9 @@ def get(fname=None, lname=None, phone=None):
             # Query using the fname, lname
             pass
 
+def search(any_param):
+    """Searches for possible matches"""
+    pass
 
 def update(fname=None, lname=None, phone=None):
     """Updates a particular contact"""
