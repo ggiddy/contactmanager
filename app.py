@@ -58,9 +58,10 @@ class ContactManager(cmd.Cmd):
         print new
 
     @docopt_cmd
-    def do_search(self, name):
-        """Usage: search <name>"""
-        pass
+    def do_search(self, line):
+        """Usage: search <first_name>"""
+        contacts = app_functions.search_contact(line)
+        print contacts
 
     @docopt_cmd
     def do_contacts(self, line):
@@ -82,8 +83,9 @@ class ContactManager(cmd.Cmd):
 
     @docopt_cmd
     def do_edit(self, line):
-        """Usage edit <name> -n <new_name> <new_phone>"""
-        pass
+        """Usage: edit <first_name>"""
+        contact = app_functions.edit_contact(line)
+        print contact
 
     @docopt_cmd
     def do_history(self, name):

@@ -1,14 +1,39 @@
 """Functions that perform operations on DB"""
-from sqlalchemy import create_engine
+import os
+import sys
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
-from table_def import Contacts, Messages, BASE
+from sqlalchemy import create_engine
 
-ENGINE = create_engine('sqlite:///contacts.db')
+BASE = declarative_base()
+
+class Contacts(BASE):
+    """Define contacts table"""
+    __tablename__ = 'contacts'
+    # Define columns.
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String(250), nullable=False)
+    last_name = Column(String(250), nullable=True)
+    phone_number = Column(String(13), nullable=False, unique=True)
+
+
+class Messages(BASE):
+    """Define messages table"""
+    __tablename__ = 'messages'
+
+    id = Column(Integer, primary_key=True)
+    content = Column(String(250))
+    sent_to = Column(Integer, ForeignKey('contacts.id'))
+
+# Create engine.
+ENGINE = create_engine('sqlite:///../../contacts.db')
 
 # Bind engine to the Base class metadata
 BASE.metadata.bind = ENGINE
 
-DB_SESSION = sessionmaker(bind=ENGINE, expire_on_commit=True)
+DB_SESSION = sessionmaker(bind=ENGINE)
 SESSION = DB_SESSION()
 
 # Create a new contact
@@ -31,7 +56,7 @@ def get(fname=None, lname=None, phone=None):
         # Get specific records
         if fname:
             # Query using the fname
-            contacts = SESSION.query(Contacts).filter(Contacts.first_name == fname).all()
+            contacts = SESSION.query(Contacts).filter(Contacts.first_name.contains(fname)).all()
             return contacts
         if lname:
             # Query using the lname, if more than one record, ask for lname

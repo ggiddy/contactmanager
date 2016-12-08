@@ -15,12 +15,13 @@ def new_contact(line):
         phone_number = line['<phone_number>']
 
         # Check if phone number has been saved
-        contact = db_functions.get(first_name)
+        contacts = db_functions.get(first_name)
 
-        if contact:
-            if phone_number == contact.phone_number:
-                # Phone number already saved.
-                return "That phone number already exists"
+        if contacts:
+            for con in contacts:
+                if phone_number == con.phone_number:
+                    # Phone number already saved.
+                    return "That phone number already exists"
         else:
             # Save contact and return it
             new = db_functions.create(first_name, phone_number, last_name)
@@ -38,6 +39,23 @@ def all_contacts():
         print "Contacts found"
         return contacts
 
-def search_contact():
+def search_contact(line):
     """Search a contact using the given parameters"""
-    return 1
+    first_name = line['<first_name>']
+    contacts = db_functions.get(first_name)
+    return contacts
+
+
+def edit_contact(line):
+    """Update a contact"""
+    first_name = line['<first_name>']
+
+    # Find the contact that matches the first name
+    contact = db_functions.get(first_name)
+
+    if len(contact) == 0:
+        return 'No contacts matching %s were found' % first_name
+    else:
+        if len(contact) > 0:
+            # More than 1 contact with the same firstname found
+            return contact
