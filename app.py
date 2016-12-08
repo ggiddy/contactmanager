@@ -57,7 +57,8 @@ class ContactManager(cmd.Cmd):
     def do_add(self, line):
         """Usage: add -f <first_name> -l <last_name> -p <phone_number>"""
         new = app_functions.new_contact(line)
-        print "Added %s %s %s" % (new.first_name, new.last_name, new.phone_number)
+        if new:
+            print "Added %s %s %s" % (new.first_name, new.last_name, new.phone_number)
 
     @docopt_cmd
     def do_search(self, line):
@@ -112,7 +113,7 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_text(self, line):
         """Usage: text <first_name> -m <message>"""
-        res = app_functions.send_text(line)
+        app_functions.send_text(line)
 
     @docopt_cmd
     def do_delete(self, line):

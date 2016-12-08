@@ -26,7 +26,7 @@ def new_contact(line):
             for con in contacts:
                 if phone_number == con.phone_number:
                     # Phone number already saved.
-                    return "That phone number already exists"
+                    print "That phone number already exists"
             # Same name different phone number
             new = db_functions.create(first_name, phone_number, last_name)
             return new
@@ -35,7 +35,7 @@ def new_contact(line):
             new = db_functions.create(first_name, phone_number, last_name)
             return new
     else: # Invalid phone
-        return "Not a valid phone number"
+        print "Not a valid phone number"
 
 def all_contacts():
     """Retrieve all contacts"""
@@ -153,6 +153,7 @@ def send_text(line):
                 print "Message sent successfully"
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
+    return True
 
 def sync():
     """Sync contacts to firebase"""
