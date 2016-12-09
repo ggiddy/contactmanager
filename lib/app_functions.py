@@ -63,9 +63,9 @@ def edit_contact(line):
              matching_contact.last_name, matching_contact.phone_number]
         conts.append(cts)
         os.system('clear')
-        print tabulate(conts, \
+        print colored(tabulate(conts, \
                     headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid')
+                    tablefmt='fancy_grid'), 'cyan')
         do_update(matching_contact)
     elif len(contact) > 1:
         # More than 1 contact
@@ -74,9 +74,9 @@ def edit_contact(line):
             cts = [con.id, con.first_name, con.last_name, con.phone_number]
             conts.append(cts)
         os.system('clear')
-        print tabulate(conts, \
+        print colored(tabulate(conts, \
                     headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid')
+                    tablefmt='fancy_grid'), 'cyan')
         try:
             cont_id = int(raw_input('Enter the ID of the contact to edit:  '))
             in_results = False
@@ -105,16 +105,24 @@ def delete_contact(line):
         conts = []
         if len(contacts) > 1:
             for c in contacts:
-                cts = [c.id, c.first_name, c.last_name]
+                cts = [c.id, c.first_name, c.last_name, c.phone_number]
                 conts.append(cts)
             os.system('clear')
 
-            print tabulate(conts, \
+            print colored(tabulate(conts, \
                     headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid')
+                    tablefmt='fancy_grid'), 'cyan')
             try:
                 contact_id = int(raw_input("Enter the ID of the contact to delete: "))
-                deleted = db_functions.delete(contact_id)
+                in_results = False
+                for contact in contacts:
+                    if contact.id == contact_id:
+                        in_results = True
+                if in_results:
+                    deleted = db_functions.delete(contact_id)
+                else:
+                    print colored("Please select ID among the records above", "red")
+                    return
                 if deleted:
                     print "Deleted"
             except ValueError:
@@ -124,11 +132,12 @@ def delete_contact(line):
             contact_id = contacts[0].id
             deleted = db_functions.delete(contact_id)
             if deleted:
-                print "Deleted"
+                print colored("Deleted", 'green', attrs=['bold'])
     else:
         return []
 
 def do_update(matching_contact):
+    """Updates contact details"""
     # What to update?
     to_update = str(raw_input("What field do you want to update?\
                 \n[F] First Name [L] Last Name [P] Phone Number  "))
@@ -139,7 +148,7 @@ def do_update(matching_contact):
             # Update firstname
             new_fname = raw_input('Enter the new First Name: ')
             if len(new_fname.split()) > 1 or len(new_fname.split()) == 0:
-                print "Please enter one name"
+                print colored("Please enter one name", "red")
                 return
             elif len(new_fname.split()) == 1:
                 # Good input, update
@@ -209,9 +218,9 @@ def send_text(line):
             cts = [c.id, c.first_name, c.last_name]
             conts.append(cts)
         os.system('clear')
-        print tabulate(conts, \
+        print colored(tabulate(conts, \
                 headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
-                tablefmt='fancy_grid')
+                tablefmt='fancy_grid'), 'cyan')
         try:
             contact_id = int(raw_input("Enter the ID of the contact to send to: "))
             found_contact = db_functions.get_by_id(contact_id)

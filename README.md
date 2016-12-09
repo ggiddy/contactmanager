@@ -18,6 +18,16 @@ A console application for contact management and sending SMS
  
  `$ pip install -r requirements.txt`
 
+
+Create the database by running the file
+
+```
+
+ python ./lib/database/table_def.py
+
+```
+
+
  **Commands**
  
  ```
