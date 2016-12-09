@@ -1,1 +1,6 @@
 /.env/
+*.pyc
+/.vscode/
+*.db
+*.db-journal
+afircastalking_config.json
