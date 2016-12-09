@@ -247,11 +247,11 @@ def send_text(line):
         # Thats it, hit send and we'll take care of the rest.
 
         results = gateway.sendMessage(to, message)
-
+        print colored("Sending...", "blue")
         for recipient in results:
             # status is either "Success" or "error message"
             if recipient['status'] == 'Success':
-                print "Message sent successfully"
+                print colored("Message sent successfully", "green")
     except AfricasTalkingGatewayException, e:
         print 'Encountered an error while sending: %s' % str(e)
     return True
@@ -274,5 +274,5 @@ def sync():
         })
 
     result = fb.post('/contacts', data)
-
-    print "Synced"
+    print colored("Syncing...", "blue")
+    print colored("Synced", "green", attrs=['bold'])
