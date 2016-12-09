@@ -41,7 +41,11 @@ def create(fname, phone, lname=None):
     """Creates a new contact and saves it to DB"""
     new_contact = Contacts(first_name=fname, last_name=lname or 'NULL', phone_number=phone)
     SESSION.add(new_contact)
-    SESSION.commit()
+    try:
+        SESSION.commit()
+    except Exception as e:
+        SESSION.rollback()
+        return Exception
     return new_contact
 
 def get(fname=None, lname=None, phone=None):
@@ -72,9 +76,6 @@ def get_by_id(id):
     contact = SESSION.query(Contacts).filter(Contacts.id == id).first()
     if contact:
         return contact
-    else:
-        return False
-
 
 def search(any_param):
     """Searches for possible matches"""

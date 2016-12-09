@@ -3,7 +3,16 @@ A CLI app to manage contacts and sends SMS.
 
 Usage:
     app.py (-i | --interactive)
-    app.py (-h | --help | -v | --version)
+    app.py (-h | --help )
+    app.py (-v | --version)
+    Contact-Manager$: add -f <first_name> -l <last_name> -p <phone_number>
+    Contact-Manager$: view
+    Contact-Manager$: search <first_name>
+    Contact-Manager$: edit <first_name>
+    Contact-Manager$: del <first_name>
+    Contact-Manager$: text <first_name> -m <message>
+    Contact-Manager$: sync
+    Contact-Manager$: help
 
 Options:
     -i, --interactive  Interactive Mode
@@ -16,7 +25,8 @@ from docopt import docopt, DocoptExit
 import lib.app_functions as app_functions
 from lib.database import db_functions
 from tabulate import tabulate
-
+from pyfiglet import Figlet, figlet_format
+from termcolor import cprint, colored
 import sys
 import os
 
@@ -52,13 +62,15 @@ def docopt_cmd(func):
 
 class ContactManager(cmd.Cmd):
     """Handler for the incoming commands."""
+    fig = Figlet(font='doom')
+    print cprint(figlet_format('Contact Manager'), 'yellow', attrs=['bold', 'blink'])
+    intro = colored('-- Version -- 1.0\n', 'yellow', attrs=['bold'])
+    prompt = colored('Contact-Manager$: ', 'yellow', attrs=['bold'])
 
     @docopt_cmd
     def do_add(self, line):
         """Usage: add -f <first_name> -l <last_name> -p <phone_number>"""
-        new = app_functions.new_contact(line)
-        if new:
-            print "Added %s %s %s" % (new.first_name, new.last_name, new.phone_number)
+        app_functions.new_contact(line)
 
     @docopt_cmd
     def do_search(self, line):
@@ -74,21 +86,25 @@ class ContactManager(cmd.Cmd):
 
         if length > 0:
             if length > 1:
-                print str(length) + ' contacts found\n'
-                print tabulate(conts, \
+                print colored('\n\t   ' +str(length) + ' contacts found matching "%s" \n' \
+                    % line['<first_name>'], 'green', attrs=['bold'])
+                print colored(tabulate(conts, \
                     headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid')
+                    tablefmt='fancy_grid'), 'cyan')
             else:
-                print str(length) + ' contact found\n'
-                print tabulate(conts, \
+                print colored('\n\t   ' + str(length) + ' contact found matching "%s" \n' % \
+                     line['<first_name>'], 'green', attrs=['bold'])
+                print colored(tabulate(conts, \
                     headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid')
+                    tablefmt='fancy_grid'), 'cyan')
         else:
-            print "No contacts found matching " + line['<first_name>']
+            print colored("\n No contacts found matching \"" + line['<first_name>'] +"\"\n", \
+                 "red", attrs=['bold'])
 
     @docopt_cmd
-    def do_contacts(self, line):
-        """Usage: contacts"""
+    def do_view(self, line):
+        """Usage: view"""
+        os .system('clear')
         all_contacts = db_functions.get()
         conts = []
         for c in all_contacts:
@@ -97,17 +113,18 @@ class ContactManager(cmd.Cmd):
         length = len(all_contacts)
         if length > 0:
             if length > 1:
-                print str(length) + ' contacts found\n'
-                print tabulate(conts, \
+                print colored('\n' + '\t   Total contacts('+str(length) +')', \
+                        'green', attrs=['bold'])
+                print colored(tabulate(conts, \
                     headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid')
+                    tablefmt='fancy_grid'), 'cyan')
             else:
                 print str(length) + ' contact found\n'
-                print tabulate(conts, \
+                print colored(tabulate(conts, \
                     headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid')
+                    tablefmt='fancy_grid'), 'cyan')
         else:
-            print "You have no contacts"
+            print colored("You have no saved contacts", "red")
 
 
     @docopt_cmd
@@ -116,7 +133,7 @@ class ContactManager(cmd.Cmd):
         app_functions.send_text(line)
 
     @docopt_cmd
-    def do_delete(self, line):
+    def do_del(self, line):
         """Usage: delete <first_name>"""
         app_functions.delete_contact(line)
 
@@ -126,19 +143,9 @@ class ContactManager(cmd.Cmd):
         app_functions.edit_contact(line)
 
     @docopt_cmd
-    def do_history(self, name):
-        """Usage: history <name>"""
-        pass
-
-    @docopt_cmd
     def do_sync(self, line):
         """Usage: sync"""
         app_functions.sync()
-
-    @docopt_cmd
-    def do_exit(self, line):
-        """Exits the app"""
-        pass
 
     def do_EOF(self, line):
         """Exit the app"""

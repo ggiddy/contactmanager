@@ -7,6 +7,7 @@ from tabulate import tabulate
 import requests
 from firebase import firebase
 import json
+from termcolor import cprint, colored
 
 def new_contact(line):
     """Validate and create a new contact"""
@@ -19,29 +20,22 @@ def new_contact(line):
         last_name = line['<last_name>']
         phone_number = '+254' + str(int(line['<phone_number>'])) # Format appropriately
 
-        # Check if phone number has been saved
-        contacts = db_functions.get(first_name)
-
-        if contacts:
-            for con in contacts:
-                if phone_number == con.phone_number:
-                    # Phone number already saved.
-                    print "That phone number already exists"
-            # Same name different phone number
+        # Save contact and return it
+        try:
             new = db_functions.create(first_name, phone_number, last_name)
-            return new
-        else:
-            # Save contact and return it
-            new = db_functions.create(first_name, phone_number, last_name)
-            return new
+            if new:
+                print colored("Successfully added %s %s %s" %\
+                    (new.first_name, new.last_name, new.phone_number), 'green')
+        except Exception as e:
+            print colored("The phone number already exists", 'red')
+            return
     else: # Invalid phone
-        print "Not a valid phone number"
+        print colored("The phone number is invalid", "red", attrs=['bold', 'blink'])
 
 def all_contacts():
     """Retrieve all contacts"""
     contacts = db_functions.get()
     if contacts:
-        print "100 Contacts found"
         return contacts
 
 def search_contact(line):
