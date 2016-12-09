@@ -59,11 +59,47 @@ def edit_contact(line):
     contact = db_functions.get(first_name)
 
     if len(contact) == 0:
-        return 'No contacts matching %s were found' % first_name
-    else:
-        if len(contact) > 0:
-            # More than 1 contact with the same firstname found
-            return contact
+        print 'No contacts matching %s were found' % first_name
+    elif len(contact) == 1:
+        # Exactly 1 contact found
+        contact_id = contact[0].id
+        matching_contact = db_functions.get_by_id(contact_id)
+        conts = []
+        cts = [matching_contact.id, matching_contact.first_name,\
+             matching_contact.last_name, matching_contact.phone_number]
+        conts.append(cts)
+        os.system('clear')
+        print tabulate(conts, \
+                    headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
+                    tablefmt='fancy_grid')
+        do_update(matching_contact)
+    elif len(contact) > 1:
+        # More than 1 contact
+        conts = []
+        for con in contact:
+            cts = [con.id, con.first_name, con.last_name, con.phone_number]
+            conts.append(cts)
+        os.system('clear')
+        print tabulate(conts, \
+                    headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
+                    tablefmt='fancy_grid')
+        try:
+            cont_id = int(raw_input('Enter the ID of the contact to edit:  '))
+            in_results = False
+            for con in contact:
+                if cont_id == con.id:
+                    in_results = True
+            if in_results:
+                matching_contact = db_functions.get_by_id(cont_id)
+            else:
+                print "Please select an ID from the above contacts"
+                return
+            if matching_contact:
+                do_update(matching_contact)
+            else:
+                print "No contact matches the provided id"
+        except Exception as e:
+            print "Invalid ID"
 
 def delete_contact(line):
     """Deletes a contact"""
@@ -98,6 +134,68 @@ def delete_contact(line):
     else:
         return []
 
+def do_update(matching_contact):
+    # What to update?
+    to_update = str(raw_input("What field do you want to update?\
+                \n[F] First Name [L] Last Name [P] Phone Number  "))
+    choice = re.compile(r'(f|F|l|L|p|P)')
+
+    if choice.match(to_update):
+        if to_update == 'f' or to_update == 'F':
+            # Update firstname
+            new_fname = raw_input('Enter the new First Name: ')
+            if len(new_fname.split()) > 1 or len(new_fname.split()) == 0:
+                print "Please enter one name"
+                return
+            elif len(new_fname.split()) == 1:
+                # Good input, update
+                matching_contact.first_name = new_fname
+                updated = db_functions.update(matching_contact)
+                if updated:
+                    print 'Changes saved successfully'
+                else:
+                    print 'Problem encountered with database connection'
+        if to_update == 'l' or to_update == 'L':
+            # Update lastname
+            new_lname = raw_input('Enter the new Last Name: ')
+            if len(new_lname.split()) > 1 or len(new_lname.split()) == 0:
+                print "Please enter one name"
+                return
+            elif len(new_lname.split()) == 1:
+                # Good input, update
+                matching_contact.last_name = new_lname
+                updated = db_functions.update(matching_contact)
+                if updated:
+                    print 'Changes saved successfully'
+                else:
+                    print 'Problem encountered with database connection'
+        if to_update == 'p' or to_update == 'P':
+            # Update phone
+            new_phone = raw_input('Enter the new Phone Number: ')
+            num = re.compile(r'^(07)(\d{8})$')
+            if not num.match(new_phone):
+                print "Invalid phone number"
+                return
+            new_phone = '+254' + str(int(new_phone))
+            # Can't have phone duplicates
+            all_conts = db_functions.get()
+            for con in all_conts:
+                if con.phone_number == new_phone:
+                    print "Phone number already exists"
+                    return
+            # Phone must be correct format
+            if len(new_phone.split()) > 1 or len(new_phone.split()) == 0:
+                print "Please enter one phone number"
+            elif len(new_phone.split()) == 1:
+                # Good input, update
+                matching_contact.phone_number = new_phone
+                updated = db_functions.update(matching_contact)
+                if updated:
+                    print 'Changes saved successfully'
+                else:
+                    print 'Problem encountered with database connection'
+    else:
+        print 'Invalid choice'
 
 def send_text(line):
     """Sends a text message"""

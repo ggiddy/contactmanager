@@ -70,16 +70,22 @@ def get(fname=None, lname=None, phone=None):
 def get_by_id(id):
     """Fetches a contact by id"""
     contact = SESSION.query(Contacts).filter(Contacts.id == id).first()
-    return contact
+    if contact:
+        return contact
+    else:
+        return False
 
 
 def search(any_param):
     """Searches for possible matches"""
     pass
 
-def update(fname=None, lname=None, phone=None):
+def update(contact_obj):
     """Updates a particular contact"""
-    pass
+    contact = SESSION.query(Contacts).filter(Contacts.id == contact_obj.id).first()
+    contact = contact_obj
+    SESSION.commit()
+    return True
 
 def delete(contact_id):
     """Deletes a contact"""

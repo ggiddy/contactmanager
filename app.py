@@ -123,8 +123,7 @@ class ContactManager(cmd.Cmd):
     @docopt_cmd
     def do_edit(self, line):
         """Usage: edit <first_name>"""
-        contact = app_functions.edit_contact(line)
-        print contact
+        app_functions.edit_contact(line)
 
     @docopt_cmd
     def do_history(self, name):
