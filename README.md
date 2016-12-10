@@ -27,6 +27,13 @@ Create the database by running the following command
 
 ```
 
+ **Run the app**
+ 
+ ```
+
+ python app.py -i
+
+ ```
 
  **Commands**
  
