@@ -19,7 +19,7 @@ A console application for contact management and sending SMS
  `$ pip install -r requirements.txt`
 
 
-Create the database by running the file
+Create the database by running the following command
 
 ```
 

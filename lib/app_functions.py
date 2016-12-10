@@ -7,7 +7,9 @@ from tabulate import tabulate
 import requests
 from firebase import firebase
 import json
-from termcolor import cprint, colored
+from termcolor import colored
+import sys
+import time
 
 def new_contact(line):
     """Validate and create a new contact"""
@@ -32,17 +34,66 @@ def new_contact(line):
     else: # Invalid phone
         print colored("The phone number is invalid", "red", attrs=['bold', 'blink'])
 
-def all_contacts():
+def view_all():
     """Retrieve all contacts"""
-    contacts = db_functions.get()
-    if contacts:
-        return contacts
+    all_contacts = db_functions.get()
+
+    conts = []
+    for c in all_contacts:
+        contact = [c.first_name, c.last_name, c.phone_number]
+        conts.append(contact)
+    length = len(all_contacts)
+    if length > 0:
+        if length > 1:
+            print colored('\n' + '\t   Total contacts('+str(length) +')', \
+                    'green', attrs=['bold'])
+            print colored(tabulate(conts, \
+                headers=['First Name', 'Last Name', 'Phone Number'], \
+                tablefmt='fancy_grid'), 'cyan')
+        else:
+            print str(length) + ' contact found\n'
+            print colored(tabulate(conts, \
+                headers=['First Name', 'Last Name', 'Phone Number'], \
+                tablefmt='fancy_grid'), 'cyan')
+    else:
+        print colored("You have no saved contacts", "red")
 
 def search_contact(line):
     """Search a contact using the given parameters"""
-    first_name = line['<first_name>']
-    contacts = db_functions.get(first_name)
-    return contacts
+    # Ask user for field to search by
+    field = raw_input('Search by? [F]  First Name [L] Last Name [P] Phone Number  ')
+    field_options = re.compile(r'f|F|l|L|p|P')
+
+    if not field_options.match(field):
+        print colored('Invalid entry. Use F, L or P to select', 'red')
+        return
+    else:
+        # Get the search term
+        term = raw_input('Search for?  ')
+        field = field.lower()
+        contacts = db_functions.get(param=term, field=field)
+        conts = []
+        length = len(contacts)
+        for c in contacts:
+            contact = [c.first_name, c.last_name, c.phone_number]
+            conts.append(contact)
+
+        if length > 0:
+            if length > 1:
+                print colored('\n\t   ' +str(length) + ' contacts found matching "%s" \n' \
+                    % term, 'green', attrs=['bold'])
+                print colored(tabulate(conts, \
+                    headers=['First Name', 'Last Name', 'Phone Number'], \
+                    tablefmt='fancy_grid'), 'cyan')
+            else:
+                print colored('\n\t   ' + str(length) + ' contact found matching "%s" \n' % \
+                        term, 'green', attrs=['bold'])
+                print colored(tabulate(conts, \
+                    headers=['First Name', 'Last Name', 'Phone Number'], \
+                    tablefmt='fancy_grid'), 'cyan')
+        else:
+            print colored("\n No contacts found matching \"" + term +"\"\n", \
+                    "red", attrs=['bold'])
 
 
 def edit_contact(line):
@@ -50,10 +101,10 @@ def edit_contact(line):
     first_name = line['<first_name>']
 
     # Find the contact that matches the first name
-    contact = db_functions.get(first_name)
+    contact = db_functions.get(param=first_name, field='f')
 
     if len(contact) == 0:
-        print 'No contacts matching %s were found' % first_name
+        print colored('No contacts matching %s were found' % first_name, 'red', attrs=['bold'])
     elif len(contact) == 1:
         # Exactly 1 contact found
         contact_id = contact[0].id
@@ -62,7 +113,7 @@ def edit_contact(line):
         cts = [matching_contact.id, matching_contact.first_name,\
              matching_contact.last_name, matching_contact.phone_number]
         conts.append(cts)
-        os.system('clear')
+
         print colored(tabulate(conts, \
                     headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
                     tablefmt='fancy_grid'), 'cyan')
@@ -73,7 +124,7 @@ def edit_contact(line):
         for con in contact:
             cts = [con.id, con.first_name, con.last_name, con.phone_number]
             conts.append(cts)
-        os.system('clear')
+
         print colored(tabulate(conts, \
                     headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
                     tablefmt='fancy_grid'), 'cyan')
@@ -86,19 +137,19 @@ def edit_contact(line):
             if in_results:
                 matching_contact = db_functions.get_by_id(cont_id)
             else:
-                print "Please select an ID from the above contacts"
+                print colored("Please select an ID from the above contacts", 'red')
                 return
             if matching_contact:
                 do_update(matching_contact)
             else:
-                print "No contact matches the provided id"
-        except Exception as e:
-            print "Invalid ID"
+                print colored("No contact matches the provided id", 'red', attrs=['bold'])
+        except Exception:
+            print colored("Invalid ID", "red", attrs=['bold'])
 
 def delete_contact(line):
     """Deletes a contact"""
     first_name = line['<first_name>']
-    contacts = db_functions.get(first_name)
+    contacts = db_functions.get(param=first_name, field='f')
 
     if len(contacts) > 0:
         # There are contacts matching
@@ -107,7 +158,6 @@ def delete_contact(line):
             for c in contacts:
                 cts = [c.id, c.first_name, c.last_name, c.phone_number]
                 conts.append(cts)
-            os.system('clear')
 
             print colored(tabulate(conts, \
                     headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
@@ -123,18 +173,17 @@ def delete_contact(line):
                 else:
                     print colored("Please select ID among the records above", "red")
                     return
-                if deleted:
-                    print "Deleted"
             except ValueError:
-                print "Invalid entry"
+                print colored("Invalid entry", "red", attrs=['bold'])
         elif len(contacts) == 1:
             # only one contact, delete
             contact_id = contacts[0].id
             deleted = db_functions.delete(contact_id)
-            if deleted:
-                print colored("Deleted", 'green', attrs=['bold'])
+        if deleted:
+            print colored("Deleted", "green", attrs=['bold'])
+
     else:
-        return []
+        print colored('No contacts found matching "' + first_name + '"', 'red', attrs=['bold'])
 
 def do_update(matching_contact):
     """Updates contact details"""
@@ -154,59 +203,55 @@ def do_update(matching_contact):
                 # Good input, update
                 matching_contact.first_name = new_fname
                 updated = db_functions.update(matching_contact)
-                if updated:
-                    print 'Changes saved successfully'
-                else:
-                    print 'Problem encountered with database connection'
+
         if to_update == 'l' or to_update == 'L':
             # Update lastname
             new_lname = raw_input('Enter the new Last Name: ')
             if len(new_lname.split()) > 1 or len(new_lname.split()) == 0:
-                print "Please enter one name"
+                print colored("Please enter one name", "red", attrs=['bold'])
                 return
             elif len(new_lname.split()) == 1:
                 # Good input, update
                 matching_contact.last_name = new_lname
                 updated = db_functions.update(matching_contact)
-                if updated:
-                    print 'Changes saved successfully'
-                else:
-                    print 'Problem encountered with database connection'
+
         if to_update == 'p' or to_update == 'P':
             # Update phone
             new_phone = raw_input('Enter the new Phone Number: ')
             num = re.compile(r'^(07)(\d{8})$')
             if not num.match(new_phone):
-                print "Invalid phone number"
+                print colored("Invalid phone number", 'red', attrs=['bold'])
                 return
             new_phone = '+254' + str(int(new_phone))
             # Can't have phone duplicates
             all_conts = db_functions.get()
             for con in all_conts:
                 if con.phone_number == new_phone:
-                    print "Phone number already exists"
+                    print colored("Phone number already exists", 'red', attrs=['bold'])
                     return
             # Phone must be correct format
             if len(new_phone.split()) > 1 or len(new_phone.split()) == 0:
-                print "Please enter one phone number"
+                print colored("Please enter one phone number", 'red', attrs=['bold'])
             elif len(new_phone.split()) == 1:
                 # Good input, update
                 matching_contact.phone_number = new_phone
                 updated = db_functions.update(matching_contact)
-                if updated:
-                    print 'Changes saved successfully'
-                else:
-                    print 'Problem encountered with database connection'
+
+        if updated:
+            print colored('Changes saved successfully', 'green', attrs=['bold'])
+        else:
+            print colored('Problem encountered with database connection', 'red', attrs=['bold'])
     else:
-        print 'Invalid choice'
+        print colored('Invalid choice', 'red', attrs=['bold'])
 
 def send_text(line):
     """Sends a text message"""
     first_name = line['<first_name>']
-    message = line['<message>']
+    message = ' '.join(line['<message>'])
+
     conts = []
     # Retrieve contact with given first_name
-    contact = db_functions.get(first_name)
+    contact = db_functions.get(param=first_name, field='f')
     if len(contact) == 0:
         print "There are no contacts matching %s" % first_name
     elif len(contact) == 1:
@@ -217,7 +262,7 @@ def send_text(line):
         for c in contact:
             cts = [c.id, c.first_name, c.last_name]
             conts.append(cts)
-        os.system('clear')
+
         print colored(tabulate(conts, \
                 headers=['ID', 'First Name', 'Last Name', 'Phone Number'], \
                 tablefmt='fancy_grid'), 'cyan')
@@ -245,16 +290,18 @@ def send_text(line):
     # so wrap the call in a try-catch block
     try:
         # Thats it, hit send and we'll take care of the rest.
+        delay_print(colored("Sending...", "blue"), 2)
 
         results = gateway.sendMessage(to, message)
-        print colored("Sending...", "blue")
+
         for recipient in results:
             # status is either "Success" or "error message"
             if recipient['status'] == 'Success':
                 print colored("Message sent successfully", "green")
+                return True
     except AfricasTalkingGatewayException, e:
-        print 'Encountered an error while sending: %s' % str(e)
-    return True
+        print 'Encountered an error while sending'
+        return False
 
 def sync():
     """Sync contacts to firebase"""
@@ -272,7 +319,17 @@ def sync():
                 "phone_number": contact.phone_number
             }
         })
+    try:
+        delay_print(colored("Syncing...\n", "blue", attrs=['bold']), 0.1)
+        result = fb.post('/contacts', data)
+        print colored("Synced", "green", attrs=['bold'])
+    except Exception:
+        print colored("Error in syncing. \
+                \nPlease check your internet connection.", 'red', attrs=['bold'])
 
-    result = fb.post('/contacts', data)
-    print colored("Syncing...", "blue")
-    print colored("Synced", "green", attrs=['bold'])
+def delay_print(s, delay):
+    """Delays printing"""
+    for c in s:
+        sys.stdout.write('%s' % c)
+        sys.stdout.flush()
+        time.sleep(delay)

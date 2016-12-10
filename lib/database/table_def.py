@@ -18,15 +18,6 @@ class Contacts(BASE):
     last_name = Column(String(250), nullable=True)
     phone_number = Column(String(13), nullable=False, unique=True)
 
-
-class Messages(BASE):
-    """Define messages table"""
-    __tablename__ = 'messages'
-
-    id = Column(Integer, primary_key=True)
-    content = Column(String(250))
-    sent_to = Column(Integer, ForeignKey('contacts.id'))
-
 # Create engine.
 ENGINE = create_engine('sqlite:///../../contacts.db')
 

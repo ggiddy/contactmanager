@@ -6,26 +6,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from table_def import Contacts
+from termcolor import colored
 
 BASE = declarative_base()
-
-class Contacts(BASE):
-    """Define contacts table"""
-    __tablename__ = 'contacts'
-    # Define columns.
-    id = Column(Integer, primary_key=True)
-    first_name = Column(String(250), nullable=False)
-    last_name = Column(String(250), nullable=True)
-    phone_number = Column(String(13), nullable=False, unique=True)
-
-
-class Messages(BASE):
-    """Define messages table"""
-    __tablename__ = 'messages'
-
-    id = Column(Integer, primary_key=True)
-    content = Column(String(250))
-    sent_to = Column(Integer, ForeignKey('contacts.id'))
 
 # Create engine.
 ENGINE = create_engine('sqlite:///../../contacts.db')
@@ -48,9 +32,9 @@ def create(fname, phone, lname=None):
         return Exception
     return new_contact
 
-def get(fname=None, lname=None, phone=None):
+def get(param=None, field=None):
     """Fetches contacts from the DB"""
-    if not (fname or lname or phone):
+    if not param:
 
         # Get all records if no params passed
         contacts = SESSION.query(Contacts).all()
@@ -58,28 +42,24 @@ def get(fname=None, lname=None, phone=None):
 
     else:
         # Get specific records
-        if fname:
-            # Query using the fname
-            contacts = SESSION.query(Contacts).filter(Contacts.first_name.contains(fname)).all()
+        if field == 'f':
+            # Query using the first name
+            contacts = SESSION.query(Contacts).filter(Contacts.first_name.contains(param)).all()
             return contacts
-        if lname:
-            # Query using the lname, if more than one record, ask for lname
-            pass
-        if phone:
-            # Query using phone
-            pass
-        if fname and lname:
-            # Query using the fname, lname
-            pass
+        if field == 'l':
+            # Query using the last name
+            contacts = SESSION.query(Contacts).filter(Contacts.last_name.contains(param)).all()
+            return contacts
+        if field == 'p':
+            # Query using the phone number
+            contacts = SESSION.query(Contacts).filter(Contacts.phone_number.contains(param)).all()
+            return contacts
+
 def get_by_id(id):
     """Fetches a contact by id"""
     contact = SESSION.query(Contacts).filter(Contacts.id == id).first()
     if contact:
         return contact
-
-def search(any_param):
-    """Searches for possible matches"""
-    pass
 
 def update(contact_obj):
     """Updates a particular contact"""
@@ -92,10 +72,9 @@ def delete(contact_id):
     """Deletes a contact"""
     contact = SESSION.query(Contacts).filter(Contacts.id == contact_id).first()
     if not contact:
-        print "Invalid id"
+        return False
     else:
-        print 'Deleting...'
+        print colored("Deleting...", "blue", attrs=['bold'])
         deleted = SESSION.delete(contact)
         SESSION.commit()
         return True
-

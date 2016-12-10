@@ -62,10 +62,17 @@ def docopt_cmd(func):
 
 class ContactManager(cmd.Cmd):
     """Handler for the incoming commands."""
+    os.system('clear')
     fig = Figlet(font='doom')
-    print cprint(figlet_format('Contact Manager'), 'yellow', attrs=['bold', 'blink'])
-    intro = colored('-- Version -- 1.0\n', 'yellow', attrs=['bold'])
+    app_functions.delay_print(colored(fig.renderText('ContactManager'),\
+         'yellow', attrs=['bold', 'blink']), 0.001)
+    intro = colored('-- Version 1.0 --\n', 'yellow', attrs=['bold'])
     prompt = colored('Contact-Manager$: ', 'yellow', attrs=['bold'])
+
+    def precmd(self, line):
+        """Clear the screen before running commands"""
+        os.system('clear')
+        return cmd.Cmd.precmd(self, line)
 
     @docopt_cmd
     def do_add(self, line):
@@ -74,62 +81,17 @@ class ContactManager(cmd.Cmd):
 
     @docopt_cmd
     def do_search(self, line):
-        """Usage: search <first_name>"""
-        os.system('clear')
-        contacts = app_functions.search_contact(line)
-        conts = []
-        length = len(contacts)
-
-        for c in contacts:
-            contact = [c.first_name, c.last_name, c.phone_number]
-            conts.append(contact)
-
-        if length > 0:
-            if length > 1:
-                print colored('\n\t   ' +str(length) + ' contacts found matching "%s" \n' \
-                    % line['<first_name>'], 'green', attrs=['bold'])
-                print colored(tabulate(conts, \
-                    headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid'), 'cyan')
-            else:
-                print colored('\n\t   ' + str(length) + ' contact found matching "%s" \n' % \
-                     line['<first_name>'], 'green', attrs=['bold'])
-                print colored(tabulate(conts, \
-                    headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid'), 'cyan')
-        else:
-            print colored("\n No contacts found matching \"" + line['<first_name>'] +"\"\n", \
-                 "red", attrs=['bold'])
+        """Usage: search"""
+        app_functions.search_contact(line)
 
     @docopt_cmd
     def do_view(self, line):
         """Usage: view"""
-        os .system('clear')
-        all_contacts = db_functions.get()
-        conts = []
-        for c in all_contacts:
-            contact = [c.first_name, c.last_name, c.phone_number]
-            conts.append(contact)
-        length = len(all_contacts)
-        if length > 0:
-            if length > 1:
-                print colored('\n' + '\t   Total contacts('+str(length) +')', \
-                        'green', attrs=['bold'])
-                print colored(tabulate(conts, \
-                    headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid'), 'cyan')
-            else:
-                print str(length) + ' contact found\n'
-                print colored(tabulate(conts, \
-                    headers=['First Name', 'Last Name', 'Phone Number'], \
-                    tablefmt='fancy_grid'), 'cyan')
-        else:
-            print colored("You have no saved contacts", "red")
-
+        app_functions.view_all()
 
     @docopt_cmd
     def do_text(self, line):
-        """Usage: text <first_name> -m <message>"""
+        """Usage: text <first_name> -m [<message>...]"""
         app_functions.send_text(line)
 
     @docopt_cmd
@@ -147,17 +109,16 @@ class ContactManager(cmd.Cmd):
         """Usage: sync"""
         app_functions.sync()
 
-    def do_EOF(self, line):
-        """Exit the app"""
-        print "Good Bye"
-        return True
 
 OPT = docopt(__doc__, sys.argv[1:], version="ContactManager version: 1.0")
 
 if OPT['--interactive']:
     try:
-        print __doc__
+        app_functions.delay_print(__doc__, 0.001)
         ContactManager().cmdloop()
     except KeyboardInterrupt:
-        print "Exiting App..."
+        os.system('clear')
+        f = Figlet(font='contessa')
+        app_functions.delay_print('\n\n' + \
+                colored(f.renderText('Goodbye...'), 'yellow', attrs=['bold', 'blink']), 0.01)
         
