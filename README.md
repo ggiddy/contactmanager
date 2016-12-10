@@ -43,7 +43,7 @@ Create the database by running the following command
  app.py (-v | --version)
  Contact-Manager$: add -f <first_name> -l <last_name> -p <phone_number>
  Contact-Manager$: view
- Contact-Manager$: search <first_name>
+ Contact-Manager$: search
  Contact-Manager$: edit <first_name>
  Contact-Manager$: del <first_name>
  Contact-Manager$: text <first_name> -m <message>
