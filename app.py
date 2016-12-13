@@ -25,8 +25,8 @@ from docopt import docopt, DocoptExit
 import lib.app_functions as app_functions
 from lib.database import db_functions
 from tabulate import tabulate
-from pyfiglet import Figlet, figlet_format
-from termcolor import cprint, colored
+from pyfiglet import Figlet
+from termcolor import colored
 import sys
 import os
 

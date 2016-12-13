@@ -1,7 +1,7 @@
 """Functions that perform operations on DB"""
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
@@ -12,7 +12,7 @@ from termcolor import colored
 BASE = declarative_base()
 
 # Create engine.
-ENGINE = create_engine('sqlite:///../../contacts.db')
+ENGINE = create_engine('sqlite:///contacts.db')
 
 # Bind engine to the Base class metadata
 BASE.metadata.bind = ENGINE
@@ -75,6 +75,6 @@ def delete(contact_id):
         return False
     else:
         print colored("Deleting...", "blue", attrs=['bold'])
-        deleted = SESSION.delete(contact)
+        SESSION.delete(contact)
         SESSION.commit()
         return True

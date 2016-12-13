@@ -51,7 +51,7 @@ def view_all():
                 headers=['First Name', 'Last Name', 'Phone Number'], \
                 tablefmt='fancy_grid'), 'cyan')
         else:
-            print str(length) + ' contact found\n'
+            print colored('\n\t   ' + str(length) + ' contact found\n', 'green', attrs=['bold'])
             print colored(tabulate(conts, \
                 headers=['First Name', 'Last Name', 'Phone Number'], \
                 tablefmt='fancy_grid'), 'cyan')

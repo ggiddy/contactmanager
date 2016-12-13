@@ -19,7 +19,7 @@ class Contacts(BASE):
     phone_number = Column(String(13), nullable=False, unique=True)
 
 # Create engine.
-ENGINE = create_engine('sqlite:///../../contacts.db')
+ENGINE = create_engine('sqlite:///contacts.db')
 
 # Create all tables
 BASE.metadata.create_all(ENGINE)
